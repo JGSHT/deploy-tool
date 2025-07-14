@@ -39,7 +39,6 @@ dependencies {
     implementation libs.flyway.mysql
     implementation 'org.springframework:spring-web'
     implementation 'com.mysql:mysql-connector-j'
-    implementation 'org.apache.httpcomponents.client5:httpclient5'
 }
 compileJava {
     options.encoding = 'UTF-8'
@@ -51,9 +50,16 @@ jar {
     exclude 'src/main/resources/db', 'src/main/resources/chart', 'src/main/resources/application.properties'
 }
 
+
 graalvmNative {
     binaries {
         main {
+            def native_enc = org.gradle.internal.os.OperatingSystem.current().isWindows() ? 'GBK' : 'UTF-8'
+            buildArgs.addAll([
+                    '-H:+AddAllCharsets',
+                    '-H:IncludeLocales=zh',
+                    "-Dfile.encoding=${native_enc}",
+                    '--enable-url-protocols=https'])
             sharedLibrary = false
             mainClass = 'com.huyiyu.deploy.DeployApplication'
         }

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-@Command(name = "eco-deploy", description = "辅助部署工具", versionProvider = GitPropertyVersion.class)
+@Command(name = "deploy-tool", description = "deploy-tool 是一个针对数据库更新和版本下发的辅助工具", versionProvider = GitPropertyVersion.class)
 @Component
 @Slf4j
 @RequiredArgsConstructor
