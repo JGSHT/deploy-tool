@@ -21,25 +21,25 @@ import java.util.Base64;
 public class HttpConfig {
 
 
-  @Bean
-  public RestClient.Builder restClientBuilder() {
-    JdkClientHttpRequestFactory requestFactory = new JdkClientHttpRequestFactory();
-    requestFactory.setReadTimeout(Duration.ofSeconds(5));
-    return RestClient.builder().requestFactory(requestFactory);
-  }
+    @Bean
+    public RestClient.Builder restClientBuilder() {
+        JdkClientHttpRequestFactory requestFactory = new JdkClientHttpRequestFactory();
+        requestFactory.setReadTimeout(Duration.ofSeconds(5));
+        return RestClient.builder().requestFactory(requestFactory);
+    }
 
-  @Bean
-  public ArtifactoryExchange artifactoryExchange(DeployProperties deployProperties,
-      RestClient.Builder builder) {
-    Flyway flyway = deployProperties.getFlyway();
-    String s = flyway.getRepoUsername() + ":" + flyway.getRepoPassword();
-    String cert = Base64.getEncoder().encodeToString(s.getBytes(StandardCharsets.UTF_8));
-    builder
-        .baseUrl(flyway.getRepoUrl())
-        .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + cert);
-    return HttpServiceProxyFactory.builderFor(RestClientAdapter.create(builder.build()))
-        .build().createClient(ArtifactoryExchange.class);
-  }
+    @Bean
+    public ArtifactoryExchange artifactoryExchange(DeployProperties deployProperties,
+                                                   RestClient.Builder builder) {
+        Flyway flyway = deployProperties.getFlyway();
+        String s = flyway.getRepoUsername() + ":" + flyway.getRepoPassword();
+        String cert = Base64.getEncoder().encodeToString(s.getBytes(StandardCharsets.UTF_8));
+        builder
+                .baseUrl(flyway.getRepoUrl())
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + cert);
+        return HttpServiceProxyFactory.builderFor(RestClientAdapter.create(builder.build()))
+                .build().createClient(ArtifactoryExchange.class);
+    }
 
 
 }

@@ -9,11 +9,11 @@ import org.springframework.stereotype.Repository;
 public class FlywayDao extends AbstractJdbcTemplateDaoSupport {
 
 
-  public boolean checkTableExist(String password) {
-    return smartExecuteSql(password, jdbcTemplate -> jdbcTemplate.queryForLong(CHECK_EXIST_SQL) > 0L);
-  }
+    public boolean checkTableExist(String password) {
+        return smartExecuteSql(password, jdbcTemplate -> jdbcTemplate.queryForLong(CHECK_EXIST_SQL) > 0L);
+    }
 
-  public String getPreviousVersion(String password) {
-    return smartExecuteSql(password, jdbcTemplate -> jdbcTemplate.queryForString(GET_PREVIOUS_VERSION_SQL));
-  }
+    public String getPreviousVersion(String password) {
+        return smartExecuteSql(password, jdbcTemplate -> jdbcTemplate.queryForString(GET_PREVIOUS_VERSION_SQL));
+    }
 }

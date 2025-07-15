@@ -73,6 +73,7 @@ graalvmNative {
                     '--enable-url-protocols=https'])
             sharedLibrary = false
             mainClass = 'com.huyiyu.deploy.DeployToolApplication'
+            name = 'deploy-tool'
 
         }
     }
