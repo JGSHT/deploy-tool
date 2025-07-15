@@ -104,9 +104,8 @@ public class FlywayService {
   private Flyway createFlyway(String password, String locations) {
     DeployProperties.Flyway flyway = deployProperties.getFlyway();
     locations = StringUtils.hasText(locations) ? locations : flyway.getLocations();
-    password = StringUtils.hasText(password) ? password : flyway.getPassword();
     return org.flywaydb.core.Flyway.configure()
-        .dataSource(flyway.getJdbcUrl(), flyway.getUsername(), password)
+        .dataSource(flyway.getJdbcUrl(), flyway.getJdbcUser(), password)
         .baselineVersion(flyway.getBaselineVersion())
         .baselineOnMigrate(flyway.isBaselineOnMigrate())
         .sqlMigrationPrefix(flyway.getMigratePrefix())
@@ -121,7 +120,7 @@ public class FlywayService {
 
   private int downZipFileByVersionAndDelete(String version, Function<File, Integer> function) {
     String templatFileName = UUID.randomUUID().toString() + ".zip";
-    File file = new File(deployProperties.getRepo().getWorkdir(), templatFileName);
+    File file = new File(deployProperties.getFlyway().getWorkdir(), templatFileName);
     Resource resource = artifactoryExchange.pull(version + ".zip");
     try (InputStream inputStream = resource.getInputStream()) {
       ZipUtil.unpack(inputStream, file);

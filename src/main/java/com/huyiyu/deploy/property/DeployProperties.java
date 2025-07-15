@@ -7,34 +7,27 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("deploy")
 public class DeployProperties {
 
-  private Repo repo;
   private Flyway flyway;
-
-  @Data
-  public static class Repo {
-
-    /**
-     * 仓库地址
-     */
-    private String url;
-    /**
-     * 用户名
-     */
-    private String username;
-    /**
-     * 密码
-     */
-    private String password;
-    /**
-     * 工作目录
-     */
-    private String workdir = System.getProperty("user.dir");
-
-  }
 
   @Data
   public static class Flyway {
 
+    /**
+     * 仓库地址
+     */
+    private String repoUrl;
+    /**
+     * 用户名
+     */
+    private String repoUsername;
+    /**
+     * 密码
+     */
+    private String repoPassword;
+    /**
+     * 工作目录
+     */
+    private String workdir = System.getProperty("user.dir");
     private String baselineVersion = "1.0.0";
     private boolean baselineOnMigrate = true;
     private String migratePrefix = "V";
@@ -43,8 +36,7 @@ public class DeployProperties {
     private String schema = "flywaydb";
     private String locations = "filesystem:${user.dir}";
     private String jdbcUrl;
-    private String username;
-    private String password;
+    private String jdbcUser;
 
   }
 }

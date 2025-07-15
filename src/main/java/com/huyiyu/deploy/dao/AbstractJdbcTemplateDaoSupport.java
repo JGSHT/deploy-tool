@@ -27,8 +27,7 @@ public abstract class AbstractJdbcTemplateDaoSupport implements BeanFactoryAware
   }
 
   protected <T> T smartExecuteSql(String password, DaoFunction<T> function) {
-    password = password == null ? flyway.getPassword() : password;
-    try (Connection connection = DriverManager.getConnection(flyway.getJdbcUrl(),flyway.getUsername(),password)) {
+    try (Connection connection = DriverManager.getConnection(flyway.getJdbcUrl(),flyway.getJdbcUser(),password)) {
       JdbcTemplate jdbcTemplate = new JdbcTemplate(connection, Types.VARCHAR);
       return function.run(jdbcTemplate);
     } catch (SQLException e) {

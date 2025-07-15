@@ -2,7 +2,7 @@ package com.huyiyu.deploy.config;
 
 import com.huyiyu.deploy.http.ArtifactoryExchange;
 import com.huyiyu.deploy.property.DeployProperties;
-import com.huyiyu.deploy.property.DeployProperties.Repo;
+import com.huyiyu.deploy.property.DeployProperties.Flyway;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,11 +31,11 @@ public class HttpConfig {
   @Bean
   public ArtifactoryExchange artifactoryExchange(DeployProperties deployProperties,
       RestClient.Builder builder) {
-    Repo repo = deployProperties.getRepo();
-    String s = repo.getUsername() + ":" + repo.getPassword();
+    Flyway flyway = deployProperties.getFlyway();
+    String s = flyway.getRepoUsername() + ":" + flyway.getRepoPassword();
     String cert = Base64.getEncoder().encodeToString(s.getBytes(StandardCharsets.UTF_8));
     builder
-        .baseUrl(repo.getUrl())
+        .baseUrl(flyway.getRepoUrl())
         .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + cert);
     return HttpServiceProxyFactory.builderFor(RestClientAdapter.create(builder.build()))
         .build().createClient(ArtifactoryExchange.class);
