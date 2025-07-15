@@ -8,6 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class DeployProperties {
 
   private Flyway flyway;
+  private Helm helm;
 
   @Data
   public static class Flyway {
@@ -37,6 +38,21 @@ public class DeployProperties {
     private String locations = "filesystem:${user.dir}";
     private String jdbcUrl;
     private String jdbcUser;
+
+  }
+
+  @Data
+  public static class Helm {
+    private String chart;
+    private String releaseName;
+    private String namespace;
+    private String kubeContext;
+    private String profile;
+    private String outputPath;
+    private Boolean showDiff;
+    private Boolean atomic;
+    private String timeout;
+    private Boolean dryRun;
 
   }
 }

@@ -22,7 +22,6 @@ import org.flywaydb.core.internal.util.FileUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import picocli.CommandLine.ExitCode;
 
 @Service
 @RequiredArgsConstructor
@@ -38,16 +37,16 @@ public class FlywayService {
     if (!flywayDao.checkTableExist(password)) {
       log.warn("正在初始化基线版本");
       Flyway flyway = createFlyway(password, deployProperties.getFlyway().getLocations());
-      return flyway.baseline().successfullyBaselined ? ExitCode.OK : ExitCode.SOFTWARE;
+      return flyway.baseline().successfullyBaselined ? 0 : 1;
     }
     log.warn("无需初始化基线版本");
-    return ExitCode.OK;
+    return 0;
   }
 
   public int migration(String password) {
     if (!flywayDao.checkTableExist(password)) {
       log.error("请先初始化基线版本");
-      return ExitCode.OK;
+      return 0;
     }
     Flyway flyway = createFlyway(password, deployProperties.getFlyway().getLocations());
     return flyway.migrate().success ? 0 : 1;
@@ -56,7 +55,7 @@ public class FlywayService {
   public int migrationVersion(String version, String password) {
     if (flywayDao.checkTableExist(password)) {
       log.error("请先初始化基线版本");
-      return ExitCode.OK;
+      return 0;
     } else {
       return downZipFileByVersionAndDelete(version, path -> {
         Flyway flyway = createFlyway(password, FILE_SYSTEM_PREFIX + path.getAbsolutePath());
@@ -73,7 +72,7 @@ public class FlywayService {
     } else {
       log.error("请先初始化基线版本");
     }
-    return ExitCode.OK;
+    return 0;
   }
 
   public int rollback(String password) {
@@ -93,12 +92,12 @@ public class FlywayService {
           String sql = FileUtils.readAsString(Paths.get(file.getAbsolutePath()));
           flywayDao.execute(password, sql);
         }
-        return ExitCode.OK;
+        return 0;
       });
     } else {
       log.error("请先初始化基线版本");
     }
-    return ExitCode.OK;
+    return 0;
   }
 
   private Flyway createFlyway(String password, String locations) {

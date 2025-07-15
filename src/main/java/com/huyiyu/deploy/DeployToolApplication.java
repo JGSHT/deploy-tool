@@ -1,6 +1,7 @@
 package com.huyiyu.deploy;
 
 import com.huyiyu.deploy.command.DBCommand;
+import com.huyiyu.deploy.command.HelmCommand;
 import com.huyiyu.deploy.version.GitPropertyVersion;
 import jakarta.annotation.Resource;
 import org.springframework.boot.CommandLineRunner;
@@ -10,10 +11,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.IFactory;
 import picocli.CommandLine.Option;
 
 @SpringBootApplication
-@Command(name = "deploy-tool", description = "deploy-tool 是一个针对数据库更新和版本下发的辅助工具", versionProvider = GitPropertyVersion.class)
+@Command(name = "deploy-tool",
+        description = "deploy-tool 是一个针对数据库更新和版本下发的辅助工具",
+        versionProvider = GitPropertyVersion.class
+)
 @Component
 public class DeployToolApplication implements CommandLineRunner, ExitCodeGenerator {
 
@@ -25,7 +30,12 @@ public class DeployToolApplication implements CommandLineRunner, ExitCodeGenerat
 
   private int exitcode;
   @Resource
+  private IFactory factory;
+  @Resource
   private DBCommand dbCommand;
+  @Resource
+  private HelmCommand helmCommand;
+
 
 
   public static void main(String[] args) {
@@ -37,6 +47,7 @@ public class DeployToolApplication implements CommandLineRunner, ExitCodeGenerat
   public void run(String... args) {
     CommandLine commandLine = new CommandLine(this);
     commandLine.addSubcommand(dbCommand);
+    commandLine.addSubcommand(helmCommand);
     this.exitcode = commandLine.execute(args);
   }
 

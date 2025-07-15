@@ -1,14 +1,23 @@
 package com.huyiyu.deploy.command;
 
 import com.huyiyu.deploy.service.FlywayService;
+import com.huyiyu.deploy.version.GitPropertyVersion;
 import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-import picocli.CommandLine.ScopeType;
 
-@Command(name = "db", description = "数据库操作")
+@Command(
+        name = "db",
+        description = "数据库操作",
+        versionProvider = GitPropertyVersion.class
+)
 @Component
+@Slf4j
+@RequiredArgsConstructor
 public class DBCommand {
 
   /**
@@ -18,10 +27,10 @@ public class DBCommand {
   private FlywayService flywayService;
 
   @Option(names = {"-h",
-      "--help"}, usageHelp = true, description = "帮助信息", scope = ScopeType.INHERIT)
+      "--help"}, usageHelp = true, description = "帮助信息", scope = CommandLine.ScopeType.INHERIT)
   private boolean help;
   @Option(names = {"-p",
-      "--password"}, description = "数据库密码", interactive = true, required = true, scope = ScopeType.INHERIT)
+      "--password"}, description = "数据库密码", interactive = true, required = true, scope = CommandLine.ScopeType.INHERIT)
   private String password;
 
   @Command(name = "baseline", description = "数据库基线版本初始化")

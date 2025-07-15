@@ -31,7 +31,7 @@ dependencies {
     implementation enforcedPlatform(libs.spring.boot.dependency)
     annotationProcessor enforcedPlatform(libs.spring.boot.dependency)
     compileOnly 'org.projectlombok:lombok'
-    implementation 'org.slf4j:slf4j-api'
+    compileOnly 'org.slf4j:slf4j-api'
     annotationProcessor 'org.projectlombok:lombok'
     annotationProcessor libs.picocli.codegen
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
@@ -39,6 +39,11 @@ dependencies {
     implementation libs.flyway.mysql
     implementation 'org.springframework:spring-web'
     implementation 'com.mysql:mysql-connector-j'
+    implementation libs.commons.lang3
+    implementation libs.gson
+    implementation libs.diffutils
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 compileJava {
     options.encoding = 'UTF-8'
@@ -48,6 +53,10 @@ compileJava {
 
 bootJar {
     exclude '**/db', '**/chart', '**/application.properties'
+}
+
+test {
+    useJUnitPlatform()
 }
 
 
