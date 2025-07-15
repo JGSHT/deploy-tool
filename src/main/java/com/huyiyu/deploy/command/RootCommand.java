@@ -29,7 +29,7 @@ public class RootCommand {
     return flywayService.baseline(password);
   }
 
-  @Command(name = "migration", description = "数据库更新")
+  @Command(name = "db/migration", description = "数据库更新")
   private int migration(
       @Option(names = {"-h", "--help"}, usageHelp = true, description = "帮助信息") boolean help,
       @Option(names = {"-p",

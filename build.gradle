@@ -46,8 +46,8 @@ compileJava {
 }
 
 
-jar {
-    exclude 'src/main/resources/db', 'src/main/resources/chart', 'src/main/resources/application.properties'
+bootJar {
+    exclude '**/db', '**/chart', '**/application.properties'
 }
 
 
@@ -62,6 +62,7 @@ graalvmNative {
                     '--enable-url-protocols=https'])
             sharedLibrary = false
             mainClass = 'com.huyiyu.deploy.DeployApplication'
+
         }
     }
 }

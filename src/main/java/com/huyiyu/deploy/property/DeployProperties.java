@@ -34,13 +34,14 @@ public class DeployProperties {
 
   @Data
   public static class Flyway {
+
     private String baselineVersion = "1.0.0";
     private boolean baselineOnMigrate = true;
-    private String mirgatePrefix = "V";
+    private String migratePrefix = "V";
     private String migrateSuffix = ".sql";
     private String migrateSeparator = "_";
     private String schema = "flywaydb";
-    private String locations = "classpath:db/migration";
+    private String locations = "filesystem:${user.dir}";
     private String jdbcUrl;
     private String username;
     private String password;

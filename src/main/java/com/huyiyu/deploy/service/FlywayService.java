@@ -108,7 +108,7 @@ public class FlywayService {
         .dataSource(flyway.getJdbcUrl(), flyway.getUsername(), password)
         .baselineVersion(flyway.getBaselineVersion())
         .baselineOnMigrate(flyway.isBaselineOnMigrate())
-        .sqlMigrationPrefix(flyway.getMirgatePrefix())
+        .sqlMigrationPrefix(flyway.getMigratePrefix())
         .sqlMigrationSeparator(flyway.getMigrateSeparator())
         .sqlMigrationSuffixes(flyway.getMigrateSuffix())
         .defaultSchema(flyway.getSchema())

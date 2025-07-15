@@ -2,3 +2,5 @@
 .idea/
 build/
 null
+**.DS_Store
+middleware/**_data/
