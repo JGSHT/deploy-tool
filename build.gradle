@@ -31,7 +31,7 @@ dependencies {
     implementation enforcedPlatform(libs.spring.boot.dependency)
     annotationProcessor enforcedPlatform(libs.spring.boot.dependency)
     compileOnly 'org.projectlombok:lombok'
-    compileOnly 'org.slf4j:slf4j-api'
+    implementation 'org.slf4j:slf4j-api'
     annotationProcessor 'org.projectlombok:lombok'
     annotationProcessor libs.picocli.codegen
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
@@ -54,6 +54,8 @@ bootJar {
 graalvmNative {
     binaries {
         main {
+            verbose = true
+            debug = true
             def native_enc = org.gradle.internal.os.OperatingSystem.current().isWindows() ? 'GBK' : 'UTF-8'
             buildArgs.addAll([
                     '-H:+AddAllCharsets',
@@ -61,7 +63,7 @@ graalvmNative {
                     "-Dfile.encoding=${native_enc}",
                     '--enable-url-protocols=https'])
             sharedLibrary = false
-            mainClass = 'com.huyiyu.deploy.DeployApplication'
+            mainClass = 'com.huyiyu.deploy.DeployToolApplication'
 
         }
     }

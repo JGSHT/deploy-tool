@@ -1,0 +1,47 @@
+package com.huyiyu.deploy;
+
+import com.huyiyu.deploy.command.DBCommand;
+import com.huyiyu.deploy.version.GitPropertyVersion;
+import jakarta.annotation.Resource;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.ExitCodeGenerator;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.stereotype.Component;
+import picocli.CommandLine;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+
+@SpringBootApplication
+@Command(name = "deploy-tool", description = "deploy-tool 是一个针对数据库更新和版本下发的辅助工具", versionProvider = GitPropertyVersion.class)
+@Component
+public class DeployToolApplication implements CommandLineRunner, ExitCodeGenerator {
+
+
+  @Option(names = {"-v", "--version"}, versionHelp = true, description = "版本信息")
+  private boolean version;
+  @Option(names = {"-h", "--help"}, usageHelp = true, description = "帮助信息")
+  private boolean help;
+
+  private int exitcode;
+  @Resource
+  private DBCommand dbCommand;
+
+
+  public static void main(String[] args) {
+    System.exit(SpringApplication.exit(SpringApplication.run(DeployToolApplication.class, args)));
+  }
+
+
+  @Override
+  public void run(String... args) {
+    CommandLine commandLine = new CommandLine(this);
+    commandLine.addSubcommand(dbCommand);
+    this.exitcode = commandLine.execute(args);
+  }
+
+  @Override
+  public int getExitCode() {
+    return this.exitcode;
+  }
+}
