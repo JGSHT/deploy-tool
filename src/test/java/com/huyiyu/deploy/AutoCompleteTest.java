@@ -9,12 +9,12 @@ import picocli.AutoComplete;
  * @description:
  * @since 2025/7/15 17:18
  */
-@SpringBootTest
+
 public class AutoCompleteTest {
 
 
     @Test
     public void test(){
-        AutoComplete.main(new String[]{"-n=deploy-tool","com.huyiyu.deploy.DeployToolApplication"});
+        AutoComplete.main(new String[]{"-n=deploy-tool","com.huyiyu.deploy.auto.complete.RootCommand"});
     }
 }
