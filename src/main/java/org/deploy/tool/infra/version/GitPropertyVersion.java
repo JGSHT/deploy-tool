@@ -1,4 +1,4 @@
-package org.deploy.tool.version;
+package org.deploy.tool.infra.version;
 
 import java.io.IOException;
 import java.io.InputStream;

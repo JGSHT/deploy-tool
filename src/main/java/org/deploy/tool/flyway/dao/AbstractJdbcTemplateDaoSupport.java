@@ -1,7 +1,7 @@
-package org.deploy.tool.dao;
+package org.deploy.tool.flyway.dao;
 
-import org.deploy.tool.property.DeployProperties;
-import org.deploy.tool.property.DeployProperties.Flyway;
+import org.deploy.tool.infra.property.DeployProperties;
+import org.deploy.tool.infra.property.DeployProperties.Flyway;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

@@ -1,8 +1,8 @@
-package org.deploy.tool.config;
+package org.deploy.tool.flyway.config;
 
-import org.deploy.tool.http.ArtifactoryExchange;
-import org.deploy.tool.property.DeployProperties;
-import org.deploy.tool.property.DeployProperties.Flyway;
+import org.deploy.tool.flyway.http.ArtifactoryExchange;
+import org.deploy.tool.infra.property.DeployProperties;
+import org.deploy.tool.infra.property.DeployProperties.Flyway;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

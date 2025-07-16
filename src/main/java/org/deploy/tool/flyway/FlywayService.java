@@ -1,13 +1,15 @@
-package org.deploy.tool.service;
+package org.deploy.tool.flyway;
 
-import org.deploy.tool.dao.FlywayDao;
-import org.deploy.tool.http.ArtifactoryExchange;
-import org.deploy.tool.property.DeployProperties;
-import org.deploy.tool.utils.ZipUtil;
+import org.deploy.tool.flyway.dao.FlywayDao;
+import org.deploy.tool.flyway.http.ArtifactoryExchange;
+import org.deploy.tool.infra.property.DeployProperties;
+import org.deploy.tool.infra.utils.ZipUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.flywaydb.core.Flyway;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -19,7 +21,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 
-import static org.deploy.tool.constant.DbConstant.VERSION_PATTERN;
+import static org.deploy.tool.flyway.constant.DbConstant.VERSION_PATTERN;
 
 @Service
 @Slf4j
@@ -31,56 +33,44 @@ public class FlywayService {
     private final ArtifactoryExchange artifactoryExchange;
 
 
-    public int baseline(String password) {
+    public void baseline(String password) {
         if (!flywayDao.checkTableExist(password)) {
             log.warn("正在初始化基线版本");
             Flyway flyway = createFlyway(password);
-            return flyway.baseline().successfullyBaselined ? CommandLine.ExitCode.OK : CommandLine.ExitCode.SOFTWARE;
+            flyway.baseline();
         }
         log.warn("无需初始化基线版本");
-        return CommandLine.ExitCode.OK;
     }
 
     public int publish() {
         if (!checkPathInvalid()) {
-            throw new RuntimeException("当前工作目录需要满足fileSystem:db/migration/V*.*.*/*.sql格式");
+            throw new RuntimeException("推送目录需要满足:db/migration/V*.*.*/*.sql格式");
         }
         File sourceFile = new File(deployProperties.getFlyway().getWorkdir(), "db");
         File targetFile = new File(deployProperties.getFlyway().getWorkdir(), deployProperties.getFlyway().getRepoSQLFile());
         ZipUtil.compress(sourceFile.getAbsolutePath(),targetFile.getAbsolutePath());
         try(FileInputStream inputStream = new FileInputStream(targetFile)){
-            artifactoryExchange.push(deployProperties.getFlyway().getRepoSQLFile(), inputStream);
+            artifactoryExchange.push(deployProperties.getFlyway().getRepoSQLFile(), new FileSystemResource(targetFile.getAbsolutePath()));
         } catch (IOException e) {
             throw new RuntimeException("上传文件失败",e);
         }
         return CommandLine.ExitCode.OK;
     }
 
-    private boolean checkPathInvalid() {
-        File file = new File(deployProperties.getFlyway().getWorkdir(), "db/migration");
-        return file.exists() && file.isDirectory();
-    }
-
     public int migration(String password) {
-        if (flywayDao.checkTableExist(password)) {
-            return baseline(password);
-        } else {
-            return downZipFileByVersionAndDelete(path -> {
-                Flyway flyway = createFlyway(password);
-                return flyway.migrate().success ? CommandLine.ExitCode.OK : CommandLine.ExitCode.SOFTWARE;
-            });
-        }
+        baseline(password);
+        return downZipFileByVersionAndDelete(path -> {
+            Flyway flyway = createFlyway(password);
+            return flyway.migrate().success ? CommandLine.ExitCode.OK : CommandLine.ExitCode.SOFTWARE;
+        });
     }
 
 
     public int repair(String password) {
-        if (flywayDao.checkTableExist(password)) {
-            Flyway flyway = createFlyway(password);
-            flyway.repair();
-            return CommandLine.ExitCode.OK;
-        } else {
-            return baseline(password);
-        }
+        baseline(password);
+        Flyway flyway = createFlyway(password);
+        flyway.repair();
+        return CommandLine.ExitCode.OK;
     }
 
     public int rollback(String password) {
@@ -135,7 +125,7 @@ public class FlywayService {
     private int downZipFileByVersionAndDelete(Function<File, Integer> function) {
         Resource resource = artifactoryExchange.pull(deployProperties.getFlyway().getRepoSQLFile());
         String workdir = deployProperties.getFlyway().getWorkdir();
-        File tmp = new File(workdir, UUID.randomUUID().toString());
+        File tmp = new File(workdir);
         try (InputStream inputStream = resource.getInputStream()) {
             File flywayZip = new File(workdir, deployProperties.getFlyway().getRepoSQLFile());
             FileUtils.copyToFile(inputStream, flywayZip);
@@ -147,5 +137,11 @@ public class FlywayService {
         } finally {
             FileUtils.deleteQuietly(tmp);
         }
+    }
+
+
+    private boolean checkPathInvalid() {
+        File file = new File(deployProperties.getFlyway().getWorkdir(), "db/migration");
+        return file.exists() && file.isDirectory();
     }
 }

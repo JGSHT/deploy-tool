@@ -1,4 +1,4 @@
-package org.deploy.tool.property;
+package org.deploy.tool.infra.property;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

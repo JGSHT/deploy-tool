@@ -1,6 +1,6 @@
 package org.deploy.tool.complete;
 
-import org.deploy.tool.version.GitPropertyVersion;
+import org.deploy.tool.infra.version.GitPropertyVersion;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ExitCode;

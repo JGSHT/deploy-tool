@@ -1,6 +1,6 @@
 package org.deploy.tool.complete;
 
-import org.deploy.tool.enums.Operation;
+import org.deploy.tool.helm.enums.Operation;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ExitCode;

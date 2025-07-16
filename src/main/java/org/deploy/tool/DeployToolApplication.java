@@ -1,8 +1,8 @@
 package org.deploy.tool;
 
-import org.deploy.tool.command.DBCommand;
-import org.deploy.tool.command.HelmCommand;
-import org.deploy.tool.version.GitPropertyVersion;
+import org.deploy.tool.flyway.DBCommand;
+import org.deploy.tool.helm.HelmCommand;
+import org.deploy.tool.infra.version.GitPropertyVersion;
 import jakarta.annotation.Resource;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.ExitCodeGenerator;

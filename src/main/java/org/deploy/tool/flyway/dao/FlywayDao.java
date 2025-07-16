@@ -1,7 +1,7 @@
-package org.deploy.tool.dao;
+package org.deploy.tool.flyway.dao;
 
-import static org.deploy.tool.constant.DbConstant.CHECK_EXIST_SQL;
-import static org.deploy.tool.constant.DbConstant.GET_PREVIOUS_VERSION_SQL;
+import static org.deploy.tool.flyway.constant.DbConstant.CHECK_EXIST_SQL;
+import static org.deploy.tool.flyway.constant.DbConstant.GET_PREVIOUS_VERSION_SQL;
 
 import org.springframework.stereotype.Repository;
 

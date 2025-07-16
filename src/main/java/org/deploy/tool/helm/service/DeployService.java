@@ -1,13 +1,13 @@
-package org.deploy.tool.service;
+package org.deploy.tool.helm.service;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.deploy.tool.diff.DiffGenerator;
-import org.deploy.tool.enums.Operation;
-import org.deploy.tool.property.DeployProperties;
-import org.deploy.tool.renderer.HelmTemplateRenderer;
+import org.deploy.tool.helm.diff.DiffGenerator;
+import org.deploy.tool.helm.enums.Operation;
+import org.deploy.tool.infra.property.DeployProperties;
+import org.deploy.tool.helm.renderer.HelmTemplateRenderer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -100,7 +100,7 @@ public class DeployService {
     }
 
     private String getCurrentManifest(Operation operation) throws Exception {
-        if (operation == org.deploy.tool.enums.Operation.upgrade) {
+        if (operation == Operation.upgrade) {
             return executeAndCapture(List.of(
                     "helm", "get", "manifest", deployProperties.getHelm().getReleaseName(), "--namespace", deployProperties.getHelm().getNamespace()
             ));

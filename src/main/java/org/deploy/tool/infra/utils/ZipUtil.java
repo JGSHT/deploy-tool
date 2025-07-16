@@ -1,4 +1,4 @@
-package org.deploy.tool.utils;
+package org.deploy.tool.infra.utils;
 
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;

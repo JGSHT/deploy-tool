@@ -1,4 +1,4 @@
-package org.deploy.tool.constant;
+package org.deploy.tool.flyway.constant;
 
 import java.util.regex.Pattern;
 
