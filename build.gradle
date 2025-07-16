@@ -5,7 +5,7 @@ plugins {
     alias libs.plugins.spring.boot
 }
 
-group = 'com.huyiyu'
+group = 'org.deploy.tool'
 version = '0.0.1-SNAPSHOT'
 
 java {
@@ -39,7 +39,8 @@ dependencies {
     implementation libs.flyway.mysql
     implementation 'org.springframework:spring-web'
     implementation 'com.mysql:mysql-connector-j'
-    implementation libs.commons.lang3
+    implementation 'org.apache.commons:commons-lang3'
+    implementation libs.commons.compress
     implementation libs.gson
     implementation libs.diffutils
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -72,8 +73,7 @@ graalvmNative {
                     "-Dfile.encoding=${native_enc}",
                     '--enable-url-protocols=https'])
             sharedLibrary = false
-            mainClass = 'com.huyiyu.deploy.DeployToolApplication'
-            name = 'deploy-tool'
+            mainClass = 'org.deploy.tool.DeployToolApplication'
 
         }
     }
