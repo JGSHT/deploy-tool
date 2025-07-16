@@ -4,3 +4,7 @@ build/
 null
 **.DS_Store
 middleware/**_data/
+db/
+flywaydb.zip
+deploy_tool_completion
+deploy_tool.exe_completion

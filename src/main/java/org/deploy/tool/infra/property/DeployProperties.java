@@ -56,10 +56,6 @@ public class DeployProperties {
          */
         private String schema = "flywaydb";
         /**
-         * 默认路径
-         */
-        private String locations = "filesystem:${user.dir}";
-        /**
          * 更新数据库地址
          */
         private String jdbcUrl;

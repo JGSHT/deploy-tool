@@ -68,6 +68,7 @@ graalvmNative {
             debug = true
             def native_enc = org.gradle.internal.os.OperatingSystem.current().isWindows() ? 'GBK' : 'UTF-8'
             buildArgs.addAll([
+                    '--initialize-at-build-time=org.slf4j.helpers',
                     '-H:+AddAllCharsets',
                     '-H:IncludeLocales=zh',
                     "-Dfile.encoding=${native_enc}",

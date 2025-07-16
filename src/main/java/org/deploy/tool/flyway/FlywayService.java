@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.flywaydb.core.Flyway;
-import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -17,10 +16,10 @@ import picocli.CommandLine;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 
+import static org.deploy.tool.flyway.constant.DbConstant.FILE_SYSTEM_PREFIX;
 import static org.deploy.tool.flyway.constant.DbConstant.VERSION_PATTERN;
 
 @Service
@@ -28,120 +27,125 @@ import static org.deploy.tool.flyway.constant.DbConstant.VERSION_PATTERN;
 @RequiredArgsConstructor
 public class FlywayService {
 
-    private final DeployProperties deployProperties;
-    private final FlywayDao flywayDao;
-    private final ArtifactoryExchange artifactoryExchange;
+  private final DeployProperties deployProperties;
+  private final FlywayDao flywayDao;
+  private final ArtifactoryExchange artifactoryExchange;
 
 
-    public void baseline(String password) {
-        if (!flywayDao.checkTableExist(password)) {
-            log.warn("正在初始化基线版本");
-            Flyway flyway = createFlyway(password);
-            flyway.baseline();
-        }
-        log.warn("无需初始化基线版本");
+  public void baseline(String password) {
+    if (!flywayDao.checkTableExist(password)) {
+      log.info("正在初始化基线版本");
+      Flyway flyway = createFlyway(password);
+      flyway.baseline();
+    } else {
+      log.info("无需初始化基线版本");
     }
 
-    public int publish() {
-        if (!checkPathInvalid()) {
-            throw new RuntimeException("推送目录需要满足:db/migration/V*.*.*/*.sql格式");
-        }
-        File sourceFile = new File(deployProperties.getFlyway().getWorkdir(), "db");
-        File targetFile = new File(deployProperties.getFlyway().getWorkdir(), deployProperties.getFlyway().getRepoSQLFile());
-        ZipUtil.compress(sourceFile.getAbsolutePath(),targetFile.getAbsolutePath());
-        try(FileInputStream inputStream = new FileInputStream(targetFile)){
-            artifactoryExchange.push(deployProperties.getFlyway().getRepoSQLFile(), new FileSystemResource(targetFile.getAbsolutePath()));
-        } catch (IOException e) {
-            throw new RuntimeException("上传文件失败",e);
-        }
-        return CommandLine.ExitCode.OK;
+  }
+
+  public int publish() {
+    if (!checkPathInvalid()) {
+      throw new RuntimeException("推送目录需要满足:db/migration/V*.*.*/*.sql格式");
     }
-
-    public int migration(String password) {
-        baseline(password);
-        return downZipFileByVersionAndDelete(path -> {
-            Flyway flyway = createFlyway(password);
-            return flyway.migrate().success ? CommandLine.ExitCode.OK : CommandLine.ExitCode.SOFTWARE;
-        });
+    File sourceFile = new File(deployProperties.getFlyway().getWorkdir(), "db");
+    File targetFile = new File(deployProperties.getFlyway().getWorkdir(),
+        deployProperties.getFlyway().getRepoSQLFile());
+    ZipUtil.compress(sourceFile.getAbsolutePath(), targetFile.getAbsolutePath());
+    try (FileInputStream inputStream = new FileInputStream(targetFile)) {
+      artifactoryExchange.push(deployProperties.getFlyway().getRepoSQLFile(),
+          new FileSystemResource(targetFile.getAbsolutePath()));
+    } catch (IOException e) {
+      throw new RuntimeException("上传文件失败", e);
     }
+    return CommandLine.ExitCode.OK;
+  }
+
+  public int migration(String password) {
+    baseline(password);
+    return downZipFileByVersionAndDelete(path -> {
+      Flyway flyway = createFlyway(password);
+      return flyway.migrate().success ? CommandLine.ExitCode.OK : CommandLine.ExitCode.SOFTWARE;
+    });
+  }
 
 
-    public int repair(String password) {
-        baseline(password);
-        Flyway flyway = createFlyway(password);
-        flyway.repair();
-        return CommandLine.ExitCode.OK;
-    }
+  public int repair(String password) {
+    baseline(password);
+    Flyway flyway = createFlyway(password);
+    flyway.repair();
+    return CommandLine.ExitCode.OK;
+  }
 
-    public int rollback(String password) {
-        if (flywayDao.checkTableExist(password)) {
-            String rawVersion = flywayDao.getPreviousVersion(password);
-            if (!StringUtils.hasText(rawVersion)) {
-                throw new RuntimeException("不支持回滚,可能的原因是: 没有可回滚的版本？超过回滚时效");
+  public int rollback(String password) {
+    if (flywayDao.checkTableExist(password)) {
+      String rawVersion = flywayDao.getPreviousVersion(password);
+      if (!StringUtils.hasText(rawVersion)) {
+        throw new RuntimeException("不支持回滚,可能的原因是: 没有可回滚的版本？超过回滚时效");
+      }
+      Matcher matcher = VERSION_PATTERN.matcher(rawVersion);
+      if (!matcher.matches()) {
+        throw new RuntimeException("版本号不正确");
+      }
+      flywayDao.deleteHistoryByVersion(password, rawVersion);
+      return downZipFileByVersionAndDelete(path -> {
+        File parentFile = new File(path, "db/rollback");
+        if (parentFile.exists() || parentFile.isDirectory()) {
+          File[] files = parentFile.listFiles();
+          if (files != null) {
+            for (File file : files) {
+              try {
+                String sql = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+                flywayDao.execute(password, sql);
+              } catch (IOException e) {
+                throw new RuntimeException("文件不存在", e);
+              }
             }
-            Matcher matcher = VERSION_PATTERN.matcher(rawVersion);
-            if (!matcher.matches()) {
-                throw new RuntimeException("版本号不正确");
-            }
-            return downZipFileByVersionAndDelete(path -> {
-                File parentFile = new File(path, "db/rollback");
-                if (parentFile.exists() || parentFile.isDirectory()) {
-                    File[] files = parentFile.listFiles();
-                    if (files != null) {
-                        for (File file : files) {
-                            try {
-                                String sql = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-                                flywayDao.execute(password, sql);
-                            } catch (IOException e) {
-                                throw new RuntimeException("文件不存在", e);
-                            }
-                        }
-                    }
-                }
-                return CommandLine.ExitCode.OK;
-            });
-        } else {
-            log.error("请先初始化基线版本");
+          }
         }
         return CommandLine.ExitCode.OK;
+      });
+    } else {
+      log.error("请先初始化基线版本");
     }
+    return CommandLine.ExitCode.OK;
+  }
 
-    private Flyway createFlyway(String password) {
-        DeployProperties.Flyway flyway = deployProperties.getFlyway();
-        return org.flywaydb.core.Flyway.configure()
-                .dataSource(flyway.getJdbcUrl(), flyway.getJdbcUser(), password)
-                .baselineVersion(flyway.getBaselineVersion())
-                .baselineOnMigrate(flyway.isBaselineOnMigrate())
-                .sqlMigrationPrefix(flyway.getMigratePrefix())
-                .sqlMigrationSeparator(flyway.getMigrateSeparator())
-                .sqlMigrationSuffixes(flyway.getMigrateSuffix())
-                .defaultSchema(flyway.getSchema())
-                .encoding(StandardCharsets.UTF_8)
-                .locations(flyway.getLocations())
-                .load();
+  private Flyway createFlyway(String password) {
+    DeployProperties.Flyway flyway = deployProperties.getFlyway();
+    return org.flywaydb.core.Flyway.configure()
+        .dataSource(flyway.getJdbcUrl(), flyway.getJdbcUser(), password)
+        .baselineVersion(flyway.getBaselineVersion())
+        .baselineOnMigrate(flyway.isBaselineOnMigrate())
+        .sqlMigrationPrefix(flyway.getMigratePrefix())
+        .sqlMigrationSeparator(flyway.getMigrateSeparator())
+        .sqlMigrationSuffixes(flyway.getMigrateSuffix())
+        .defaultSchema(flyway.getSchema())
+        .encoding(StandardCharsets.UTF_8)
+        .locations(
+            FILE_SYSTEM_PREFIX + new File(flyway.getWorkdir(), "db/migration").getAbsolutePath())
+        .load();
+  }
+
+
+  private int downZipFileByVersionAndDelete(Function<File, Integer> function) {
+    Resource resource = artifactoryExchange.pull(deployProperties.getFlyway().getRepoSQLFile());
+    String workdir = deployProperties.getFlyway().getWorkdir();
+    File tmp = new File(workdir);
+    File flywayZip = new File(workdir, deployProperties.getFlyway().getRepoSQLFile());
+    try (InputStream inputStream = resource.getInputStream()) {
+      FileUtils.copyToFile(inputStream, flywayZip);
+      ZipUtil.extract(flywayZip, workdir);
+      return function.apply(tmp);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    } finally {
+      FileUtils.deleteQuietly(flywayZip);
     }
+  }
 
 
-    private int downZipFileByVersionAndDelete(Function<File, Integer> function) {
-        Resource resource = artifactoryExchange.pull(deployProperties.getFlyway().getRepoSQLFile());
-        String workdir = deployProperties.getFlyway().getWorkdir();
-        File tmp = new File(workdir);
-        try (InputStream inputStream = resource.getInputStream()) {
-            File flywayZip = new File(workdir, deployProperties.getFlyway().getRepoSQLFile());
-            FileUtils.copyToFile(inputStream, flywayZip);
-            ZipUtil.extract(flywayZip, workdir);
-            FileUtils.deleteQuietly(flywayZip);
-            return function.apply(tmp);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            FileUtils.deleteQuietly(tmp);
-        }
-    }
-
-
-    private boolean checkPathInvalid() {
-        File file = new File(deployProperties.getFlyway().getWorkdir(), "db/migration");
-        return file.exists() && file.isDirectory();
-    }
+  private boolean checkPathInvalid() {
+    File file = new File(deployProperties.getFlyway().getWorkdir(), "db/migration");
+    return file.exists() && file.isDirectory();
+  }
 }

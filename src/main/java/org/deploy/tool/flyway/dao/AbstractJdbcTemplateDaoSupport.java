@@ -1,5 +1,6 @@
 package org.deploy.tool.flyway.dao;
 
+import lombok.extern.slf4j.Slf4j;
 import org.deploy.tool.infra.property.DeployProperties;
 import org.deploy.tool.infra.property.DeployProperties.Flyway;
 
@@ -12,7 +13,7 @@ import org.flywaydb.core.internal.jdbc.JdbcTemplate;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-
+@Slf4j
 public abstract class AbstractJdbcTemplateDaoSupport implements BeanFactoryAware {
 
     private Flyway flyway;
@@ -38,6 +39,9 @@ public abstract class AbstractJdbcTemplateDaoSupport implements BeanFactoryAware
     }
 
     public void execute(String password, String sql) {
+        if (log.isDebugEnabled()){
+            log.debug("execute sql: {}", sql);
+        }
         smartExecuteSql(password, jdbcTemplate -> jdbcTemplate.executeStatement(sql));
     }
 }
