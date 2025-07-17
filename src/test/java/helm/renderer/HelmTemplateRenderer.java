@@ -1,4 +1,4 @@
-package org.deploy.tool.helm.renderer;
+package helm.renderer;
 
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.DumperOptions;

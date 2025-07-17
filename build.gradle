@@ -31,6 +31,7 @@ dependencies {
     implementation enforcedPlatform(libs.spring.boot.dependency)
     annotationProcessor enforcedPlatform(libs.spring.boot.dependency)
     compileOnly 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
     compileOnly 'org.slf4j:slf4j-api'
     annotationProcessor 'org.projectlombok:lombok'
     annotationProcessor libs.picocli.codegen

@@ -1,9 +1,9 @@
-package org.deploy.tool.helm;
+package helm;
 
-import org.deploy.tool.helm.enums.Operation;
+import helm.enums.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.deploy.tool.helm.service.DeployService;
+import helm.service.DeployService;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;

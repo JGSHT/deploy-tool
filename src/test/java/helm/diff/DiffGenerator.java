@@ -1,4 +1,4 @@
-package org.deploy.tool.helm.diff;
+package helm.diff;
 
 import com.github.difflib.DiffUtils;
 import com.github.difflib.patch.AbstractDelta;
