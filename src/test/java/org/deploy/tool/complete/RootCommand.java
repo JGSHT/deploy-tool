@@ -7,7 +7,7 @@ import picocli.CommandLine.Option;
 @Command(name = "deploy-tool",
     description = "deploy-tool 是一个针对数据库更新和版本下发的辅助工具",
     versionProvider = GitPropertyVersion.class,
-    subcommands = {DBCommand.class, HelmCommand.class}
+    subcommands = {DBCommand.class, DeployCommand.class}
 )
 public class RootCommand {
 
