@@ -6,10 +6,10 @@ import lombok.Data;
 @Data
 public class EnvProjectInfo {
 
-  private String description;
-  private String profile;
-  private List<Config> configs;
-  private List<Service> services;
+    private String description;
+    private String profile;
+    private List<Config> configs;
+    private List<Service> services;
 
 
 }

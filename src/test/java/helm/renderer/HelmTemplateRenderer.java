@@ -17,7 +17,7 @@ import java.util.Map;
 public class HelmTemplateRenderer {
 
     private static final DateTimeFormatter TIMESTAMP_FORMATTER =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public String renderDefaultTemplate(String releaseName, String namespace) {
         Map<String, Object> values = createDefaultValuesStructure(releaseName, namespace);
@@ -152,19 +152,21 @@ public class HelmTemplateRenderer {
     }
 
 
-    public String renderTemplateFromFile(String filePath, String releaseName, String namespace) throws IOException {
+    public String renderTemplateFromFile(String filePath, String releaseName, String namespace)
+        throws IOException {
         String template = Files.readString(Paths.get(filePath));
         return template
-                .replace("{{RELEASE_NAME}}", releaseName)
-                .replace("{{NAMESPACE}}", namespace)
-                .replace("{{TIMESTAMP}}", LocalDateTime.now().format(TIMESTAMP_FORMATTER));
+            .replace("{{RELEASE_NAME}}", releaseName)
+            .replace("{{NAMESPACE}}", namespace)
+            .replace("{{TIMESTAMP}}", LocalDateTime.now().format(TIMESTAMP_FORMATTER));
     }
 
-    public String renderTemplateFromResource(String resourcePath, String releaseName, String namespace) throws IOException {
+    public String renderTemplateFromResource(String resourcePath, String releaseName,
+        String namespace) throws IOException {
         String template = new String(getClass().getResourceAsStream(resourcePath).readAllBytes());
         return template
-                .replace("{{RELEASE_NAME}}", releaseName)
-                .replace("{{NAMESPACE}}", namespace)
-                .replace("{{TIMESTAMP}}", LocalDateTime.now().format(TIMESTAMP_FORMATTER));
+            .replace("{{RELEASE_NAME}}", releaseName)
+            .replace("{{NAMESPACE}}", namespace)
+            .replace("{{TIMESTAMP}}", LocalDateTime.now().format(TIMESTAMP_FORMATTER));
     }
 }

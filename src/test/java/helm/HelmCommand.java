@@ -10,8 +10,8 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 @Command(
-        name = "helm",
-        description = "helm 部署管理"
+    name = "helm",
+    description = "helm 部署管理"
 )
 @Component
 @Slf4j
@@ -42,11 +42,11 @@ public class HelmCommand {
 
     @Command(name = "deploy", description = "Helm 部署")
     private int deploy(
-            @Parameters(
-                    index = "0",
-                    description = "操作类型: ${COMPLETION-CANDIDATES}",
-                    arity = "1"
-            ) Operation operation) {
+        @Parameters(
+            index = "0",
+            description = "操作类型: ${COMPLETION-CANDIDATES}",
+            arity = "1"
+        ) Operation operation) {
         return deployService.deploy(operation);
     }
 
@@ -57,15 +57,16 @@ public class HelmCommand {
      */
     @Command(name = "template", description = "生成template模板")
     public void template(
-            @Option(names = {"-o", "--output"}, description = "输出文件路径") String outputPath
+        @Option(names = {"-o", "--output"}, description = "输出文件路径") String outputPath
     ) {
         deployService.template(outputPath);
     }
 
     @Command(name = "rollback", description = "Helm 回滚")
     private int rollback(
-            @Option(names = {"--revision"}, description = "指定回滚版本号") Integer revision,
-            @Option(names = {"--smart"}, description = "智能回滚到上一个稳定版本", defaultValue = "false") boolean smartRollback
+        @Option(names = {"--revision"}, description = "指定回滚版本号") Integer revision,
+        @Option(names = {
+            "--smart"}, description = "智能回滚到上一个稳定版本", defaultValue = "false") boolean smartRollback
     ) {
         return deployService.rollback(revision, smartRollback);
     }

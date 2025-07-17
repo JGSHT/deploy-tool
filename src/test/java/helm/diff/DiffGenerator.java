@@ -11,7 +11,8 @@ import java.util.List;
 @Component
 public class DiffGenerator {
 
-    public String generateDiff(String original, String revised, String originalLabel, String revisedLabel) {
+    public String generateDiff(String original, String revised, String originalLabel,
+        String revisedLabel) {
         List<String> originalLines = Arrays.asList(original.split("\\r?\\n"));
         List<String> revisedLines = Arrays.asList(revised.split("\\r?\\n"));
 

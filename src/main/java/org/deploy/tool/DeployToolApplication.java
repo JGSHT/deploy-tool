@@ -22,35 +22,36 @@ import picocli.CommandLine.Option;
 public class DeployToolApplication implements CommandLineRunner, ExitCodeGenerator {
 
 
-  @Option(names = {"-v", "--version"}, versionHelp = true, description = "版本信息")
-  private boolean version;
-  @Option(names = {"-h", "--help"}, usageHelp = true, description = "帮助信息")
-  private boolean help;
+    @Option(names = {"-v", "--version"}, versionHelp = true, description = "版本信息")
+    private boolean version;
+    @Option(names = {"-h", "--help"}, usageHelp = true, description = "帮助信息")
+    private boolean help;
 
-  /**
-   * 退出码
-   */
-  private int exitcode;
-  @Resource
-  private IFactory factory;
-  @Resource
-  private DBCommand dbCommand;
-
-
-  public static void main(String[] args) {
-    System.exit(SpringApplication.exit(SpringApplication.run(DeployToolApplication.class, args)));
-  }
+    /**
+     * 退出码
+     */
+    private int exitcode;
+    @Resource
+    private IFactory factory;
+    @Resource
+    private DBCommand dbCommand;
 
 
-  @Override
-  public void run(String... args) {
-    CommandLine commandLine = new CommandLine(this);
-    commandLine.addSubcommand(dbCommand);
-    this.exitcode = commandLine.execute(args);
-  }
+    public static void main(String[] args) {
+        System.exit(
+            SpringApplication.exit(SpringApplication.run(DeployToolApplication.class, args)));
+    }
 
-  @Override
-  public int getExitCode() {
-    return this.exitcode;
-  }
+
+    @Override
+    public void run(String... args) {
+        CommandLine commandLine = new CommandLine(this);
+        commandLine.addSubcommand(dbCommand);
+        this.exitcode = commandLine.execute(args);
+    }
+
+    @Override
+    public int getExitCode() {
+        return this.exitcode;
+    }
 }

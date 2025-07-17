@@ -4,6 +4,6 @@ import org.springframework.core.io.Resource;
 
 public class Service {
 
-  private Resource resource;
+    private Resource resource;
 
 }

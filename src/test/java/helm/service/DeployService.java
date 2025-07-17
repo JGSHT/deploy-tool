@@ -31,11 +31,8 @@ public class DeployService {
     private final DeployProperties deployProperties;
 
     /**
-     * helm install my-app ./src/main/resources/chart \
-     * -f ./values/dev-values.yaml \
-     * --namespace dev \
-     * --create-namespace \
-     * --debug
+     * helm install my-app ./src/main/resources/chart \ -f ./values/dev-values.yaml \ --namespace
+     * dev \ --create-namespace \ --debug
      *
      * @return 部署结果
      */
@@ -61,7 +58,8 @@ public class DeployService {
         System.out.println("namespace=" + deployProperties.getHelm().getNamespace());
         try {
 
-            if (deployProperties.getHelm().getShowDiff() && (operation == Operation.upgrade || operation == Operation.install)) {
+            if (deployProperties.getHelm().getShowDiff() && (operation == Operation.upgrade
+                || operation == Operation.install)) {
                 System.out.println("正在生成 diff");
                 showDiff(operation);
             }
@@ -85,7 +83,7 @@ public class DeployService {
         String newManifest = getNewManifest();
 
         String diff = diffGenerator.generateDiff(currentManifest, newManifest,
-                "当前版本", "新版本 (" + operation + ")");
+            "当前版本", "新版本 (" + operation + ")");
 
         System.out.println("版本差异对比:");
         System.out.println(diff);
@@ -102,7 +100,8 @@ public class DeployService {
     private String getCurrentManifest(Operation operation) throws Exception {
         if (operation == Operation.upgrade) {
             return executeAndCapture(List.of(
-                    "helm", "get", "manifest", deployProperties.getHelm().getReleaseName(), "--namespace", deployProperties.getHelm().getNamespace()
+                "helm", "get", "manifest", deployProperties.getHelm().getReleaseName(),
+                "--namespace", deployProperties.getHelm().getNamespace()
             ));
         }
         return "";
@@ -133,7 +132,8 @@ public class DeployService {
                 cmd.add(deployProperties.getHelm().getReleaseName());
                 cmd.add(resolveChartPath());
                 addUpgradeOptions(operation, cmd);
-                cmd.add("--description=Deployed by CLI at " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+                cmd.add("--description=Deployed by CLI at " + new SimpleDateFormat(
+                    "yyyy-MM-dd HH:mm:ss").format(new Date()));
                 break;
 
             case upgrade:
@@ -141,14 +141,16 @@ public class DeployService {
                 cmd.add(deployProperties.getHelm().getReleaseName());
                 cmd.add(resolveChartPath());
                 addUpgradeOptions(operation, cmd);
-                cmd.add("--description=Upgraded by CLI at " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+                cmd.add("--description=Upgraded by CLI at " + new SimpleDateFormat(
+                    "yyyy-MM-dd HH:mm:ss").format(new Date()));
                 break;
 
             case uninstall:
                 cmd.add("uninstall");
                 cmd.add(deployProperties.getHelm().getReleaseName());
                 cmd.add("--namespace=" + deployProperties.getHelm().getNamespace());
-                cmd.add("--description=Uninstalled by CLI at " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+                cmd.add("--description=Uninstalled by CLI at " + new SimpleDateFormat(
+                    "yyyy-MM-dd HH:mm:ss").format(new Date()));
                 break;
 
             case status:
@@ -182,9 +184,12 @@ public class DeployService {
 
     private void addGlobalOptions(List<String> cmd) {
         cmd.add("--namespace=" + deployProperties.getHelm().getNamespace());
-        if (deployProperties.getHelm().getKubeContext() != null)
+        if (deployProperties.getHelm().getKubeContext() != null) {
             cmd.add("--kube-context=" + deployProperties.getHelm().getKubeContext());
-        if (deployProperties.getHelm().getAtomic()) cmd.add("--atomic");
+        }
+        if (deployProperties.getHelm().getAtomic()) {
+            cmd.add("--atomic");
+        }
         cmd.add("--timeout=" + deployProperties.getHelm().getTimeout());
     }
 
@@ -225,7 +230,7 @@ public class DeployService {
         Process process = pb.start();
 
         try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(process.getInputStream()))) {
+            new InputStreamReader(process.getInputStream()))) {
 
             String line;
             while ((line = reader.readLine()) != null) {
@@ -243,23 +248,25 @@ public class DeployService {
         System.out.println("🩺 检查应用健康状态...");
 
         List<String> cmd = List.of(
-                "kubectl", "rollout", "status", "deployment/" + deployProperties.getHelm().getReleaseName(),
-                "--namespace=" + deployProperties.getHelm().getNamespace(),
-                "--watch=true",
-                "--timeout=5m"
+            "kubectl", "rollout", "status",
+            "deployment/" + deployProperties.getHelm().getReleaseName(),
+            "--namespace=" + deployProperties.getHelm().getNamespace(),
+            "--watch=true",
+            "--timeout=5m"
         );
 
         executeCommand(cmd);
         System.out.println("应用状态健康");
     }
 
-    private String executeAndCapture(List<String> command) throws IOException, InterruptedException {
+    private String executeAndCapture(List<String> command)
+        throws IOException, InterruptedException {
         ProcessBuilder pb = new ProcessBuilder(command);
         Process process = pb.start();
 
         StringBuilder output = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(process.getInputStream()))) {
+            new InputStreamReader(process.getInputStream()))) {
 
             String line;
             while ((line = reader.readLine()) != null) {
@@ -321,7 +328,8 @@ public class DeployService {
 
         // 获取发布历史
         String historyJson = executeAndCapture(List.of(
-                "helm", "history", deployProperties.getHelm().getReleaseName(), "--namespace", deployProperties.getHelm().getNamespace(), "-o", "json"
+            "helm", "history", deployProperties.getHelm().getReleaseName(), "--namespace",
+            deployProperties.getHelm().getNamespace(), "-o", "json"
         ));
 
         // 解析历史记录
@@ -356,9 +364,10 @@ public class DeployService {
         System.out.println("↩️ 回滚到版本: " + revision);
 
         List<String> cmd = List.of(
-                "helm", "rollback", deployProperties.getHelm().getReleaseName(), String.valueOf(revision),
-                "--namespace", deployProperties.getHelm().getNamespace(),
-                "--description=Rollback initiated by CLI"
+            "helm", "rollback", deployProperties.getHelm().getReleaseName(),
+            String.valueOf(revision),
+            "--namespace", deployProperties.getHelm().getNamespace(),
+            "--description=Rollback initiated by CLI"
         );
 
         executeCommand(cmd);

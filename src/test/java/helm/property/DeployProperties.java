@@ -10,6 +10,7 @@ public class DeployProperties {
 
     @Data
     public static class Helm {
+
         private String chart;
         private String releaseName;
         private String namespace;

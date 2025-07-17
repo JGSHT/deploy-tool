@@ -11,9 +11,9 @@ import picocli.CommandLine.Option;
 )
 public class RootCommand {
 
-  @Option(names = {"-v", "--version"}, versionHelp = true, description = "版本信息")
-  private boolean version;
-  @Option(names = {"-h", "--help"}, usageHelp = true, description = "帮助信息")
-  private boolean help;
+    @Option(names = {"-v", "--version"}, versionHelp = true, description = "版本信息")
+    private boolean version;
+    @Option(names = {"-h", "--help"}, usageHelp = true, description = "帮助信息")
+    private boolean help;
 
 }

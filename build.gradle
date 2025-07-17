@@ -34,18 +34,19 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok'
     compileOnly 'org.slf4j:slf4j-api'
     annotationProcessor 'org.projectlombok:lombok'
-    annotationProcessor libs.picocli.codegen
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-    implementation libs.picocli.boot
-    implementation libs.flyway.mysql
+    annotationProcessor libs.picocli.codegen
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'org.springframework:spring-web'
     implementation 'com.mysql:mysql-connector-j'
     implementation 'org.apache.commons:commons-lang3'
+    implementation libs.picocli.boot
+    implementation libs.flyway.mysql
     implementation libs.commons.compress
     implementation libs.gson
     implementation libs.diffutils
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
 }
 compileJava {
     options.encoding = 'UTF-8'
