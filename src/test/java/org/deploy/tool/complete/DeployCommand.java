@@ -1,4 +1,4 @@
-package org.deploy.tool.kust.command;
+package org.deploy.tool.complete;
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -31,12 +31,13 @@ public class DeployCommand {
   @Command(name = "update", description = "将服务升级到对应版本,用于日常升级服务")
   public int update(@Option(names = {"-t", "--tag"}) String tag,
       @Option(names = {"--instances", "-i"}, description = "更新服务实例") List<String> instances) {
-    // 将服务升级到对应版本,用于日常升级服务
+    //TODO  将服务升级到对应版本,用于日常升级服务
     return ExitCode.OK;
   }
 
   @Command(name = "backup", description = "备份当前配置信息,并上传到制品库")
   public int backup() {
+    //TODO 备份当前配置
     return ExitCode.OK;
   }
 
